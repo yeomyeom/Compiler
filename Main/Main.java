@@ -22,6 +22,7 @@ public class Main {
 				filename = option;
 				// 문법에 맞는지 체크하고 simbol 테이블 만들기
 				ArrayList<String> token_list = lexical(filename);
+				// token_list 에 있는 애들이 문법에 적합한지 확인
 			}
 		}catch(java.lang.ArrayIndexOutOfBoundsException e){
 			// java -jar Main.jar 이후에 인자 잘못 입력하면 에러메시지 출력
@@ -35,7 +36,7 @@ public class Main {
 			Scanner s = new Scanner(f);
 			ArrayList<String> code = new ArrayList<String>();// 코드 한줄한줄
 			ArrayList<String> word = new ArrayList<String>();// 코드 띄어쓰기 기준
-			ArrayList<String> token_string = new ArrayList<String>();// 코드를 토큰화 한것
+			ArrayList<String> token_list = new ArrayList<String>();// 코드를 토큰화 한것
 			while(s.hasNextLine()) {
 				code.add(s.nextLine());
 			}
@@ -45,9 +46,10 @@ public class Main {
 					word.add(words);
 				}
 			}
-			token_string = tokenize(word);
+			token_list = tokenize(word);
+			
 			s.close();
-			return token_string;
+			return token_list;
 		}catch(FileNotFoundException e) {
 			System.out.println("file");
 			return null;
