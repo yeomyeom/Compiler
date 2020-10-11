@@ -18,8 +18,8 @@ public class Main {
 					Scanner s = new Scanner(f);
 					ArrayList<String> code = codeList(s); // 코드 띄어쓰기 단위로 나눔
 					s.close();
-					la = new LexicalAnalyzer(code);
-					la.lexical();
+					Vmode v = new Vmode(code);
+					v.PROGRAMS();
 				}catch(FileNotFoundException e) {
 					System.out.println("file");
 				}catch(@SuppressWarnings("hiding") IOException e) {
