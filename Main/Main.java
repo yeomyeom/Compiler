@@ -1,11 +1,8 @@
 import java.io.File;
-import java.io.FileReader;
-import java.io.BufferedReader;
 import java.util.Scanner;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.regex.Pattern;
 
 public class Main {
 	public static void main(String[] args) {
@@ -25,7 +22,7 @@ public class Main {
 					la.lexical();
 				}catch(FileNotFoundException e) {
 					System.out.println("file");
-				}catch(IOException e) {
+				}catch(@SuppressWarnings("hiding") IOException e) {
 					System.out.println("text file encoding wrong");
 				}
 			}else {
@@ -40,7 +37,7 @@ public class Main {
 					//규칙에 맞게 정의되어 있는지 확인 하는 절차
 				}catch(FileNotFoundException e) {
 					System.out.println("file");
-				}catch(IOException e) {
+				}catch(@SuppressWarnings("hiding") IOException e) {
 					System.out.println("text file encoding wrong");
 				}
 				// token_list 에 있는 애들이 문법에 적합한지 확인

@@ -3,7 +3,6 @@ import java.util.HashMap;
 import java.util.regex.Pattern;
 
 public class LexicalAnalyzer {
-
 	int next_token;
 	String token_string;
 	ArrayList<String> code;
@@ -12,39 +11,114 @@ public class LexicalAnalyzer {
 	LexicalAnalyzer(ArrayList<String> input){
 		this.code = input;
 	}
-	
-	
 	public void PROGRAMS() {
 		simbolTable = new HashMap<String, Integer>();//simbol table 생성
 		STATEMENTS();
 		System.out.println("Result == >"); // simbol table 에 저장되어 있는 것들 출력
 	}
 	public void STATEMENTS() {
+		int success = 0; // 0: success 1: warning 2: error
 		ArrayList<Integer> token_num = new ArrayList<Integer>();
 		ArrayList<String> token_str = new ArrayList<String>();
-		for (String c : code) {
+		ArrayList<String> code_str = new ArrayList<String>();
+		for (String c : this.code) {
 			lexical(c); // 코드를 띄어쓰기 기준으로 한 단어 한 단어씩 읽어서
 			token_num.add(this.next_token);
 			token_str.add(this.token_string);
+			code_str.add(c);
 			if(this.token_string.equals("SEMI_COLON"))
-				STATEMENT(token_num, token_str);
+				System.out.println(code_str);
+				token_num.remove(token_num.size() -1); // 맨뒤 세미콜론 지우기 
+				code_str.remove(code_str.size() -1);
+				success = STATEMENT(token_num, code_str);
+				System.out.print("ID: ");
+				System.out.print("; CONST: ");
+				System.out.print("; OP: " + ";");
 				token_num.clear();
 				token_str.clear();
+				code_str.clear();
 		}
-		STATEMENT(token_num, token_str); // stats -> statement 요 규칙
+		STATEMENT(token_num, code_str); // stats -> statement 요 규칙
+		token_num.remove(token_num.size() -1); // 맨뒤 세미콜론 지우기 
+		code_str.remove(code_str.size() -1);
+		System.out.print("ID: ");
+		System.out.print("; CONST: ");
+		System.out.print("; OP: " + ";");
 	}
-	public void STATEMENT(ArrayList<Integer> token_num, ArrayList<String> token_str) {
+	public int STATEMENT(ArrayList<Integer> token_num, ArrayList<String> code_str) {
 		//[02     ,11             ,01     ] 예시임 CONST는 expression으로 넘길꺼
 		//['IDENT','ASSIGNMENT_OP','CONST']
-		if(token_str.get(0).equals("IDENT") && token_str.get(1).equals("ASSIGNMENT_OP")) {
-			EXPRESSION();
+		//['op1'  ,':='           ,'3'    ]
+		if(token_num.get(0).equals(2) && token_num.get(1).equals(11)) {
+			//simbol table에 변수 정보 전달(현재 할당 연산지니깐)
+			String ident_name = code_str.get(0);
+			token_num.remove(0);
+			token_num.remove(1);
+			code_str.remove(0);
+			code_str.remove(1);
+			if(code_str.size() >= 1) {
+				int result = EXPRESSION(token_num, code_str);
+				simbolTable.put(ident_name, result);
+			}
+			else {
+				System.out.println("(ERROR) STATEMENT 할당된 연산자가 없습니다.");
+			}
 		}
 		else {
-			//구문 오류 발생
+			//구문 오류 발생 할때 어떻게 처리할 것인가?
+		}
+		return 0;
+	}
+	public int EXPRESSION(ArrayList<Integer> token_num, ArrayList<String> code_str) {
+		//EXPRESSION -> <TERM> <TERM_TAIL>
+		//전단계 Statement 변수에 값을 저장 
+		int vale = 0;
+		TERM(token_num, code_str);
+		TERM_TAIL(token_num, code_str);
+		return vale;
+	}
+	public void TERM(ArrayList<Integer> token_num, ArrayList<String> token_str) {
+		//TERM -> <FACTOR> <FACTOR_TAIL>
+		FACTOR(token_num, token_str);
+		FACTOR_TAIL(token_num, token_str);
+	}
+	public void TERM_TAIL(ArrayList<Integer> token_num, ArrayList<String> token_str) {
+		//TERM_TAIL -> +|- <TERM> <TERM_TAIL> 또는 앱실론
+		if(token_str.get(0).equals("ADD_OPERATOR")){
+			//+ - 연산 진행 simboltable에서
+			token_str.remove(0);
+			token_num.remove(0);
+			TERM(token_num, token_str);
+			TERM_TAIL(token_num, token_str);
+		}
+		else {
+			return;
 		}
 	}
-	public void EXPRESSION() {
-		
+	public void FACTOR(ArrayList<Integer> token_num, ArrayList<String> token_str) {
+		//FACTOR -> ( <EXPRESSION> ) 또는 <IDENT> 또는 <CONST>
+		if(token_str.get(0).equals("LEFT_PAREN")) {
+			
+			EXPRESSION(token_num, token_str);
+		}else if(token_str.get(0).equals("IDENT")) {
+			
+		}else if(token_str.get(0).equals("CONST")) {
+			
+		}else {
+			//ERROR
+		}
+	}
+	public void FACTOR_TAIL(ArrayList<Integer> token_num, ArrayList<String> token_str) {
+		//FACTOR_TAIL -> *|/ <FACTOR> <FACTOR_TAIL> 또는 앱실론
+		if(token_str.get(0).equals("MULT_OPERATOR")) {
+			token_str.remove(0);
+			token_num.remove(0);
+			FACTOR(token_num, token_str);
+			FACTOR_TAIL(token_num, token_str);
+		}
+		else {
+			return;
+		}
 	}
 	
 	public void lexical(String input) {
