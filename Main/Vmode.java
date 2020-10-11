@@ -42,7 +42,6 @@ public class Vmode {
 		System.out.println(code_str);
 		try {
 			if(token_num.get(0) == 2 && token_num.get(1) == 11) {
-				String valName = code_str.get(0);
 				token_num.remove(0);
 				token_num.remove(0);
 				code_str.remove(0);
@@ -81,14 +80,7 @@ public class Vmode {
 		if(token_num.contains(31)) {// ( 게 있는 경우
 			int leftidx = token_num.indexOf(31);
 			int righidx = token_num.indexOf(32);
-			EXPRESSION(splitInt(token_num, leftidx, righidx+1), splitStr(code_str, leftidx, righidx+1));
-			// expression 연산 결과를 숫자로 받아 token code 재 작성
-			//for(int l = leftidx; l <= righidx; l++){// 괄호 연산 끝나면 최종적으로 숫자만 튀어나오게
-			//	token_num.remove(l);
-			//	code_str.remove(l);
-			//}
-			//token_num.add(leftidx, 1);
-			//code_str.add(leftidx, value); // expression 한 결과를 코드에 삽입
+			EXPRESSION(splitInt(token_num, leftidx+1, righidx), splitStr(code_str, leftidx+1, righidx));
 			if(token_num.contains(23)) {// * 로 Factor와 fac_tail 구분
 				int index = token_num.indexOf(23);
 				FACTOR(splitInt(token_num, 0, index), splitStr(code_str, 0, index));
@@ -180,9 +172,6 @@ public class Vmode {
 			System.out.println("Factor_TAIL_ 앱실론");
 		}
 	}
-	
-	
-	
 	
 	public void lexical(String input) {
 		ArrayList<String> patterns = new ArrayList<String>();
