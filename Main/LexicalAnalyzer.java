@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class LexicalAnalyzer {
@@ -13,9 +14,7 @@ public class LexicalAnalyzer {
 	}
 	public void PROGRAMS() {
 		System.out.println("PROGRAMS");
-		simbolTable = new HashMap<String, Integer>();//simbol table 생성
 		STATEMENTS();
-		System.out.println("Result == >"); // simbol table 에 저장되어 있는 것들 출력
 	}
 	public void STATEMENTS() {
 		System.out.println("STATEMENTS");
@@ -27,123 +26,165 @@ public class LexicalAnalyzer {
 			token_num.add(this.next_token);
 			token_str.add(this.token_string);
 			code_str.add(c);
-			if(this.token_string.equals("SEMI_COLON"))
+			if(this.token_string.equals("SEMI_COLON")) {
 				System.out.println(code_str);
 				token_num.remove(token_num.size() -1); // 맨뒤 세미콜론 지우기 
 				code_str.remove(code_str.size() -1);
-				String success = STATEMENT(token_num, code_str);
-				System.out.print("ID: ");
-				System.out.print("; CONST: ");
-				System.out.print("; OP: " + ";");
-				System.out.print(success);
+				token_str.remove(token_str.size() -1);
+				STATEMENT(token_num, code_str);
 				token_num.clear();
 				token_str.clear();
 				code_str.clear();
+			}
 		}
-		STATEMENT(token_num, code_str); // stats -> statement 요 규칙
-		token_num.remove(token_num.size() -1); // 맨뒤 세미콜론 지우기 
-		code_str.remove(code_str.size() -1);
-		System.out.print("ID: ");
-		System.out.print("; CONST: ");
-		System.out.print("; OP: " + ";");
+		STATEMENT(token_num, code_str);
 	}
-	public String STATEMENT(ArrayList<Integer> token_num, ArrayList<String> code_str) {
+	public void STATEMENT(ArrayList<Integer> token_num, ArrayList<String> code_str) {
 		System.out.println("STATEMENT");
-		//[02     ,11             ,01     ] 예시임 CONST는 expression으로 넘길꺼
-		//['IDENT','ASSIGNMENT_OP','CONST']
-		//['op1'  ,':='           ,'3'    ]
-		if(token_num.get(0).equals(2) && token_num.get(1).equals(11)) {
-			//simbol table에 변수 정보 전달(현재 할당 연산지니깐)
-			String ident_name = code_str.get(0);
-			token_num.remove(0);
-			token_num.remove(1);
-			code_str.remove(0);
-			code_str.remove(1);
-			if(code_str.size() >= 1) {
-				String result = EXPRESSION(token_num, code_str);
-				simbolTable.put(ident_name, Integer.parseInt(result));
-				return "ok";
-			}
-			else {
-				System.out.println("(ERROR) = 뒤가 없습니다.");
-				return "Error";
-			}
-		}
-		else {
-			return "Error";
-			//구문 오류 발생 할때 어떻게 처리할 것인가?
-		}
-	}
-	public String EXPRESSION(ArrayList<Integer> token_num, ArrayList<String> code_str) {
-		System.out.println("EXPRESSION");
-		//EXPRESSION -> <TERM> <TERM_TAIL>
-		//계산하고 값을 statement로 넘겨줌
-		String term = TERM(token_num, code_str);
-		String termTail = TERM_TAIL(token_num, code_str);
-		return (Integer.parseInt(term) + Integer.parseInt(termTail));
-	}
-	public String TERM(ArrayList<Integer> token_num, ArrayList<String> code_str) {
-		System.out.println("TERM");
-		//TERM -> <FACTOR> <FACTOR_TAIL>
-		FACTOR(token_num, code_str);
-		FACTOR_TAIL(token_num, code_str);
-	}
-	public String TERM_TAIL(ArrayList<Integer> token_num, ArrayList<String> code_str) {
-		System.out.println("TERM_TAIL");
-		//TERM_TAIL -> +|- <TERM> <TERM_TAIL> 또는 앱실론
-		if(token_num.get(0).equals(21) || token_num.get(0).equals(22)){
-			//+ - 연산 진행 simboltable에서
-			code_str.remove(0); // + - 지우기 
-			token_num.remove(0);
-			if (token_num.get(0).equals(21)) {
-				//더하기 연산 진행
-				
-			}else {
-				//빼기 연산 진행
-			}
-			TERM(token_num, code_str);
-			TERM_TAIL(token_num, code_str);
-		}
-		else {
-			return "Error";
-		}
-	}
-	public String FACTOR(ArrayList<Integer> token_num, ArrayList<String> code_str) {
-		System.out.println("FACTOR");
-		//FACTOR -> ( <EXPRESSION> ) 또는 <IDENT> 또는 <CONST>
-		if(token_num.get(0).equals(31)) {
-			ArrayList <String> temp_str = new ArrayList <String>();
-			ArrayList <Integer> temp_num = new ArrayList <Integer>();
-			for (int temp : token_num) {
-				temp_num.add(temp);
-				if(temp == 32) {
-					//
+		System.out.println(code_str);
+		try {
+			if(token_num.get(0) == 2 && token_num.get(1) == 11) {
+				String valName = code_str.get(0);
+				token_num.remove(0);
+				token_num.remove(0);
+				code_str.remove(0);
+				code_str.remove(0);
+				if(token_num.size() >= 1) {
+					EXPRESSION(token_num, code_str);
+				}else{
+					System.out.println("statement a= 뒤에 연산할꺼 없음");
 				}
 			}
-			return EXPRESSION(token_num, code_str);
-		}else if(token_num.get(0).equals(2)) {
-			//HashMap 에서 요소 찾음
-			return Integer.toString(simbolTable.get(code_str.get(0)));
-		}else if(token_num.get(0).equals(1)) {
-			return code_str.get(0);
-		}else {
-			return "Error";
-			//ERROR
+			else {
+				System.out.println("statement 대입 op나 대입연산자가 없음");
+			}
+		}catch (IndexOutOfBoundsException e) {
+			System.out.println("statement token_num.get 에러");
 		}
 	}
-	public String FACTOR_TAIL(ArrayList<Integer> token_num, ArrayList<String> code_str) {
+	public void EXPRESSION(ArrayList<Integer> token_num, ArrayList<String> code_str) {
+		System.out.println("EXPRESSION");
+		System.out.println(code_str);
+		if(token_num.contains(21)) {// + 연산자로 term과 term_tail 구분
+			int index = token_num.indexOf(21);
+			TERM(splitInt(token_num, 0, index), splitStr(code_str, 0, index));
+			TERM_TAIL(splitInt(token_num, index, token_num.size()), splitStr(code_str, index, code_str.size()));
+		}else if(token_num.contains(22)) {// - 연산자로 term과 term_tail 구분
+			int index = token_num.indexOf(22);
+			TERM(splitInt(token_num, 0, index), splitStr(code_str, 0, index));
+			TERM_TAIL(splitInt(token_num, index, token_num.size()), splitStr(code_str, index, code_str.size()));
+		}else {//term_tail이 앱실론인 경우
+			TERM(token_num, code_str);
+		}
+	}
+	public void TERM(ArrayList<Integer> token_num, ArrayList<String> code_str) {
+		System.out.println("TERM");
+		System.out.println(code_str);
+		if(token_num.contains(31)) {// ( 게 있는 경우
+			int leftidx = token_num.indexOf(31);
+			int righidx = token_num.indexOf(32);
+			EXPRESSION(splitInt(token_num, leftidx, righidx+1), splitStr(code_str, leftidx, righidx+1));
+			// expression 연산 결과를 숫자로 받아 token code 재 작성
+			//for(int l = leftidx; l <= righidx; l++){// 괄호 연산 끝나면 최종적으로 숫자만 튀어나오게
+			//	token_num.remove(l);
+			//	code_str.remove(l);
+			//}
+			//token_num.add(leftidx, 1);
+			//code_str.add(leftidx, value); // expression 한 결과를 코드에 삽입
+			if(token_num.contains(23)) {// * 로 Factor와 fac_tail 구분
+				int index = token_num.indexOf(23);
+				FACTOR(splitInt(token_num, 0, index), splitStr(code_str, 0, index));
+				FACTOR_TAIL(splitInt(token_num, index, token_num.size()), splitStr(code_str, index, code_str.size()));
+			}else if(token_num.contains(24)) {// /로 factor와 tail 구분
+				int index = token_num.indexOf(24);
+				FACTOR(splitInt(token_num, 0, index), splitStr(code_str, 0, index));
+				FACTOR_TAIL(splitInt(token_num, index, token_num.size()), splitStr(code_str, index, code_str.size()));
+			}else {// factor_tail 이 앱실론인 경우
+				FACTOR(token_num, code_str);
+			}
+		}else {// 괄호가 전혀 없다면 *, / 로 factor와 factor_tail을 구분한다.
+			if(token_num.contains(23)) {
+				int index = token_num.indexOf(23);
+				FACTOR(splitInt(token_num, 0, index), splitStr(code_str, 0, index));
+				FACTOR_TAIL(splitInt(token_num, index, token_num.size()), splitStr(code_str, index, code_str.size()));
+			}else if(token_num.contains(24)) {
+				int index = token_num.indexOf(24);
+				FACTOR(splitInt(token_num, 0, index), splitStr(code_str, 0, index));
+				FACTOR_TAIL(splitInt(token_num, index, token_num.size()), splitStr(code_str, index, code_str.size()));
+			}else {
+				FACTOR(token_num, code_str);
+			}
+		}
+	}
+	public void FACTOR(ArrayList<Integer> token_num, ArrayList<String> code_str) {
+		System.out.println("FACTOR");
+		System.out.println(code_str);
+		if(token_num.get(0) == 31) {
+			//괄호는 term쪽에서 해결했다고
+		}else if(token_num.get(0) == 2) {// ident
+			System.out.println("IDENT");
+			System.out.println("변수이름 :" + code_str.get(0));
+			//return ;
+		}else if(token_num.get(0) == 1) {// const
+			System.out.println("CONST");
+			System.out.println("상수: " + code_str.get(0));
+			//return ;
+		}
+	}
+	public void TERM_TAIL(ArrayList<Integer> token_num, ArrayList<String> code_str) {
+		System.out.println("TERM_TAIL");
+		System.out.println(code_str);
+		try {
+			if(token_num.get(0) == 21 || token_num.get(0) == 22) {
+				token_num.remove(0);
+				code_str.remove(0);
+				// + 연산지 미리 보내고 TERM, TERM_TAIL 연산 진행
+				if(token_num.contains(21)) {// + 연산자로 term과 term_tail 구분
+					int index = token_num.indexOf(21);
+					TERM(splitInt(token_num, 0, index), splitStr(code_str, 0, index));
+					TERM_TAIL(splitInt(token_num, index, token_num.size()), splitStr(code_str, index, code_str.size()));
+				}else if(token_num.contains(22)) {// - 연산자로 term과 term_tail 구분
+					int index = token_num.indexOf(22);
+					TERM(splitInt(token_num, 0, index), splitStr(code_str, 0, index));
+					TERM_TAIL(splitInt(token_num, index, token_num.size()), splitStr(code_str, index, code_str.size()));
+				}else {//term_tail이 앱실론인 경우
+					TERM(token_num, code_str);
+				}
+			}else {
+				System.out.println("term_tail에 +- 연산자가 없음");
+			}
+		}catch(IndexOutOfBoundsException e) {
+			System.out.println("TERM_TAIL_ 앱실론");
+		}	
+	}
+	public void FACTOR_TAIL(ArrayList<Integer> token_num, ArrayList<String> code_str) {
 		System.out.println("FACTOR_TAIL");
-		//FACTOR_TAIL -> *|/ <FACTOR> <FACTOR_TAIL> 또는 앱실론
-		if(code_str.get(0).equals("MULT_OPERATOR")) {
-			code_str.remove(0);
-			token_num.remove(0);
-			FACTOR(token_num, code_str);
-			FACTOR_TAIL(token_num, code_str);
-		}
-		else {
-			
+		System.out.println(code_str);
+		try {
+			if(token_num.get(0) == 23 || token_num.get(0) == 24) {
+				token_num.remove(0);
+				code_str.remove(0);
+				if(token_num.contains(23)) {
+					int index = token_num.indexOf(23);
+					FACTOR(splitInt(token_num, 0, index), splitStr(code_str, 0, index));
+					FACTOR_TAIL(splitInt(token_num, index, token_num.size()), splitStr(code_str, index, code_str.size()));
+				}else if(token_num.contains(24)) {
+					int index = token_num.indexOf(24);
+					FACTOR(splitInt(token_num, 0, index), splitStr(code_str, 0, index));
+					FACTOR_TAIL(splitInt(token_num, index, token_num.size()), splitStr(code_str, index, code_str.size()));
+				}else {
+					FACTOR(token_num, code_str);
+				}
+			}else {
+				System.out.println("factor_tail에 */ 연산자가 없음");
+			}
+		}catch (IndexOutOfBoundsException e) {
+			System.out.println("Factor_TAIL_ 앱실론");
 		}
 	}
+	
+	
+	
 	
 	public void lexical(String input) {
 		ArrayList<String> patterns = new ArrayList<String>();
@@ -161,10 +202,10 @@ public class LexicalAnalyzer {
 		for(int p = 0; p<patterns.size(); p++) {
 			if(Pattern.matches(patterns.get(p), input)) {
 				if(p==0) {
-					this.next_token = 01; // CONST
+					this.next_token = 1; // CONST
 					this.token_string = "CONST";
 				}else if(p==1) {
-					this.next_token =  02; // IDENT
+					this.next_token =  2; // IDENT
 					this.token_string = "IDENT";
 				}else if(p==2) {
 					this.next_token =  11; //ASSIGNMENT_OP
@@ -196,5 +237,17 @@ public class LexicalAnalyzer {
 				}
 			}
 		}
+	}
+	public ArrayList<Integer> splitInt(ArrayList<Integer> a, int start, int fin) {
+		List<Integer> temp = a.subList(start, fin);
+		ArrayList<Integer> t = new ArrayList<Integer>();
+		t.addAll(temp);
+		return t;
+	}
+	public ArrayList<String> splitStr(ArrayList<String> a, int start, int fin) {
+		List<String> temp = a.subList(start, fin);
+		ArrayList<String> t = new ArrayList<String>();
+		t.addAll(temp);
+		return t;
 	}
 }
