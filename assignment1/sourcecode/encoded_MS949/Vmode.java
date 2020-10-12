@@ -20,12 +20,12 @@ public class Vmode {
 		ArrayList<String> token_str = new ArrayList<String>();
 		ArrayList<String> code_str = new ArrayList<String>();
 		for (String c : this.code) {
-			lexical(c); // ì½”ë“œë¥¼ ë„ì–´ì“°ê¸° ê¸°ì¤€ìœ¼ë¡œ í•œ ë‹¨ì–´ í•œ ë‹¨ì–´ì”© ì½ì–´ì„œ
+			lexical(c); // ÄÚµå¸¦ ¶ç¾î¾²±â ±âÁØÀ¸·Î ÇÑ ´Ü¾î ÇÑ ´Ü¾î¾¿ ÀĞ¾î¼­
 			token_num.add(this.next_token);
 			token_str.add(this.token_string);
 			code_str.add(c);
 			if(this.token_string.equals("SEMI_COLON")) {
-				token_num.remove(token_num.size() -1); // ë§¨ë’¤ ì„¸ë¯¸ì½œë¡  ì§€ìš°ê¸° 
+				token_num.remove(token_num.size() -1); // ¸ÇµÚ ¼¼¹ÌÄİ·Ğ Áö¿ì±â 
 				code_str.remove(code_str.size() -1);
 				token_str.remove(token_str.size() -1);
 				STATEMENT(token_num, code_str);
@@ -47,48 +47,48 @@ public class Vmode {
 				if(token_num.size() >= 1) {
 					EXPRESSION(token_num, code_str);
 				}else{
-					//System.out.println("statement a= ë’¤ì— ì—°ì‚°í• êº¼ ì—†ìŒ");
+					//System.out.println("statement a= µÚ¿¡ ¿¬»êÇÒ²¨ ¾øÀ½");
 				}
 			}
 			else {
-				//System.out.println("statement ëŒ€ì… opë‚˜ ëŒ€ì…ì—°ì‚°ìê°€ ì—†ìŒ");
+				//System.out.println("statement ´ëÀÔ op³ª ´ëÀÔ¿¬»êÀÚ°¡ ¾øÀ½");
 			}
 		}catch (IndexOutOfBoundsException e) {
-			//System.out.println("statement token_num.get ì—ëŸ¬");
+			//System.out.println("statement token_num.get ¿¡·¯");
 		}
 	}
 	public void EXPRESSION(ArrayList<Integer> token_num, ArrayList<String> code_str) {
 		System.out.println("EXPRESSION");
-		if(token_num.contains(21)) {// + ì—°ì‚°ìë¡œ termê³¼ term_tail êµ¬ë¶„
+		if(token_num.contains(21)) {// + ¿¬»êÀÚ·Î term°ú term_tail ±¸ºĞ
 			int index = token_num.indexOf(21);
 			TERM(splitInt(token_num, 0, index), splitStr(code_str, 0, index));
 			TERM_TAIL(splitInt(token_num, index, token_num.size()), splitStr(code_str, index, code_str.size()));
-		}else if(token_num.contains(22)) {// - ì—°ì‚°ìë¡œ termê³¼ term_tail êµ¬ë¶„
+		}else if(token_num.contains(22)) {// - ¿¬»êÀÚ·Î term°ú term_tail ±¸ºĞ
 			int index = token_num.indexOf(22);
 			TERM(splitInt(token_num, 0, index), splitStr(code_str, 0, index));
 			TERM_TAIL(splitInt(token_num, index, token_num.size()), splitStr(code_str, index, code_str.size()));
-		}else {//term_tailì´ ì•±ì‹¤ë¡ ì¸ ê²½ìš°
+		}else {//term_tailÀÌ ¾Û½Ç·ĞÀÎ °æ¿ì
 			TERM(token_num, code_str);
 		}
 	}
 	public void TERM(ArrayList<Integer> token_num, ArrayList<String> code_str) {
 		System.out.println("TERM");
-		if(token_num.contains(31)) {// ( ê²Œ ìˆëŠ” ê²½ìš°
+		if(token_num.contains(31)) {// ( °Ô ÀÖ´Â °æ¿ì
 			int leftidx = token_num.indexOf(31);
 			int righidx = token_num.indexOf(32);
 			EXPRESSION(splitInt(token_num, leftidx+1, righidx), splitStr(code_str, leftidx+1, righidx));
-			if(token_num.contains(23)) {// * ë¡œ Factorì™€ fac_tail êµ¬ë¶„
+			if(token_num.contains(23)) {// * ·Î Factor¿Í fac_tail ±¸ºĞ
 				int index = token_num.indexOf(23);
 				FACTOR(splitInt(token_num, 0, index), splitStr(code_str, 0, index));
 				FACTOR_TAIL(splitInt(token_num, index, token_num.size()), splitStr(code_str, index, code_str.size()));
-			}else if(token_num.contains(24)) {// /ë¡œ factorì™€ tail êµ¬ë¶„
+			}else if(token_num.contains(24)) {// /·Î factor¿Í tail ±¸ºĞ
 				int index = token_num.indexOf(24);
 				FACTOR(splitInt(token_num, 0, index), splitStr(code_str, 0, index));
 				FACTOR_TAIL(splitInt(token_num, index, token_num.size()), splitStr(code_str, index, code_str.size()));
-			}else {// factor_tail ì´ ì•±ì‹¤ë¡ ì¸ ê²½ìš°
+			}else {// factor_tail ÀÌ ¾Û½Ç·ĞÀÎ °æ¿ì
 				FACTOR(token_num, code_str);
 			}
-		}else {// ê´„í˜¸ê°€ ì „í˜€ ì—†ë‹¤ë©´ *, / ë¡œ factorì™€ factor_tailì„ êµ¬ë¶„í•œë‹¤.
+		}else {// °ıÈ£°¡ ÀüÇô ¾ø´Ù¸é *, / ·Î factor¿Í factor_tailÀ» ±¸ºĞÇÑ´Ù.
 			if(token_num.contains(23)) {
 				int index = token_num.indexOf(23);
 				FACTOR(splitInt(token_num, 0, index), splitStr(code_str, 0, index));
@@ -105,7 +105,7 @@ public class Vmode {
 	public void FACTOR(ArrayList<Integer> token_num, ArrayList<String> code_str) {
 		System.out.println("FACTOR");
 		if(token_num.get(0) == 31) {
-			//ê´„í˜¸ëŠ” termìª½ì—ì„œ í•´ê²°í–ˆë‹¤ê³ 
+			//°ıÈ£´Â termÂÊ¿¡¼­ ÇØ°áÇß´Ù°í
 		}else if(token_num.get(0) == 2) {// ident
 			System.out.println("IDENT");
 		}else if(token_num.get(0) == 1) {// const
@@ -118,20 +118,20 @@ public class Vmode {
 			if(token_num.get(0) == 21 || token_num.get(0) == 22) {
 				token_num.remove(0);
 				code_str.remove(0);
-				// + ì—°ì‚°ì§€ ë¯¸ë¦¬ ë³´ë‚´ê³  TERM, TERM_TAIL ì—°ì‚° ì§„í–‰
-				if(token_num.contains(21)) {// + ì—°ì‚°ìë¡œ termê³¼ term_tail êµ¬ë¶„
+				// + ¿¬»êÁö ¹Ì¸® º¸³»°í TERM, TERM_TAIL ¿¬»ê ÁøÇà
+				if(token_num.contains(21)) {// + ¿¬»êÀÚ·Î term°ú term_tail ±¸ºĞ
 					int index = token_num.indexOf(21);
 					TERM(splitInt(token_num, 0, index), splitStr(code_str, 0, index));
 					TERM_TAIL(splitInt(token_num, index, token_num.size()), splitStr(code_str, index, code_str.size()));
-				}else if(token_num.contains(22)) {// - ì—°ì‚°ìë¡œ termê³¼ term_tail êµ¬ë¶„
+				}else if(token_num.contains(22)) {// - ¿¬»êÀÚ·Î term°ú term_tail ±¸ºĞ
 					int index = token_num.indexOf(22);
 					TERM(splitInt(token_num, 0, index), splitStr(code_str, 0, index));
 					TERM_TAIL(splitInt(token_num, index, token_num.size()), splitStr(code_str, index, code_str.size()));
-				}else {//term_tailì´ ì•±ì‹¤ë¡ ì¸ ê²½ìš°
+				}else {//term_tailÀÌ ¾Û½Ç·ĞÀÎ °æ¿ì
 					TERM(token_num, code_str);
 				}
 			}else {
-				//System.out.println("term_tailì— +- ì—°ì‚°ìê°€ ì—†ìŒ");
+				//System.out.println("term_tail¿¡ +- ¿¬»êÀÚ°¡ ¾øÀ½");
 			}
 		}catch(IndexOutOfBoundsException e) {
 			
@@ -155,10 +155,10 @@ public class Vmode {
 					FACTOR(token_num, code_str);
 				}
 			}else {
-				//System.out.println("factor_tailì— */ ì—°ì‚°ìê°€ ì—†ìŒ");
+				//System.out.println("factor_tail¿¡ */ ¿¬»êÀÚ°¡ ¾øÀ½");
 			}
 		}catch (IndexOutOfBoundsException e) {
-			//System.out.println("Factor_TAIL_ ì•±ì‹¤ë¡ ");
+			//System.out.println("Factor_TAIL_ ¾Û½Ç·Ğ");
 		}
 	}
 	

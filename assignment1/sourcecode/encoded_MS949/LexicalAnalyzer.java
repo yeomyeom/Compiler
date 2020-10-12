@@ -9,7 +9,7 @@ public class LexicalAnalyzer {
 	String state;
 	String token_string;
 	ArrayList<String> code;
-	HashMap<String, String> simbolTable; //simbolTable (str)ë³€ìˆ˜ ëª… : (str)ë³€ìˆ˜ ê°’ 
+	HashMap<String, String> simbolTable; //simbolTable (str)º¯¼ö ¸í : (str)º¯¼ö °ª 
 	
 	LexicalAnalyzer(ArrayList<String> input){
 		this.code = input;
@@ -29,7 +29,7 @@ public class LexicalAnalyzer {
 		ArrayList<String> token_str = new ArrayList<String>();
 		ArrayList<String> code_str = new ArrayList<String>();
 		for (String c : this.code) {
-			lexical(c); // ì½”ë“œë¥¼ ë„ì–´ì“°ê¸° ê¸°ì¤€ìœ¼ë¡œ í•œ ë‹¨ì–´ í•œ ë‹¨ì–´ì”© ì½ì–´ì„œ
+			lexical(c); // ÄÚµå¸¦ ¶ç¾î¾²±â ±âÁØÀ¸·Î ÇÑ ´Ü¾î ÇÑ ´Ü¾î¾¿ ÀĞ¾î¼­
 			token_num.add(this.next_token);
 			token_str.add(this.token_string);
 			code_str.add(c);
@@ -38,7 +38,7 @@ public class LexicalAnalyzer {
 					System.out.print(code + " ");
 				}
 				System.out.println("");
-				token_num.remove(token_num.size() -1); // ë§¨ë’¤ ì„¸ë¯¸ì½œë¡  ì§€ìš°ê¸° 
+				token_num.remove(token_num.size() -1); // ¸ÇµÚ ¼¼¹ÌÄİ·Ğ Áö¿ì±â 
 				code_str.remove(code_str.size() -1);
 				token_str.remove(token_str.size() -1);
 				this.state = "(OK)";
@@ -80,51 +80,51 @@ public class LexicalAnalyzer {
 					String val = EXPRESSION(token_num, code_str);
 					simbolTable.put(valName, val);
 					if(val.equals("Unknown")) {
-						if(simbolTable.containsValue("newUnknown")) {//newUnknown ì´ ìˆìœ¼ë©´ Unknown ê°’ìœ¼ë¡œ ë°”ê¿”ì¤Œ ì¼ë‹¨ í• ë‹¹ ëœê±°ë‹ˆê¹
+						if(simbolTable.containsValue("newUnknown")) {//newUnknown ÀÌ ÀÖÀ¸¸é Unknown °ªÀ¸·Î ¹Ù²ãÁÜ ÀÏ´Ü ÇÒ´ç µÈ°Å´Ï±ñ
 							for(String sTval : simbolTable.keySet()) {
 								if(simbolTable.get(sTval).equals("newUnknown")) {
 									simbolTable.put(sTval, "Unknown");
 								}
 							}
-							this.state = "(ERROR) ì •ì˜ë˜ì§€ ì•Šì€ ë³€ìˆ˜ê°€ ì‚¬ìš©ë˜ì—ˆìŠµë‹ˆë‹¤.";
+							this.state = "(ERROR) Á¤ÀÇµÇÁö ¾ÊÀº º¯¼ö°¡ »ç¿ëµÇ¾ú½À´Ï´Ù.";
 						}
 					}
 				}else{
-					//System.out.println("statement a= ë’¤ì— ì—°ì‚°í• êº¼ ì—†ìŒ");
-					this.state = "(ERROR) ëŒ€ì… ì—°ì‚°ì ë’¤ì— í”¼ ì—°ì‚°ìê°€ ì—†ìŠµë‹ˆë‹¤.";
+					//System.out.println("statement a= µÚ¿¡ ¿¬»êÇÒ²¨ ¾øÀ½");
+					this.state = "(ERROR) ´ëÀÔ ¿¬»êÀÚ µÚ¿¡ ÇÇ ¿¬»êÀÚ°¡ ¾ø½À´Ï´Ù.";
 				}
 			}else if(token_num.get(0)==1 && token_num.get(1)==11) {
-				this.state = "(ERROR) ìƒìˆ˜ì— ê°’ì„ ëŒ€ì…í•˜ë ¤ê³  í•˜ê³  ìˆìŠµë‹ˆë‹¤.";
+				this.state = "(ERROR) »ó¼ö¿¡ °ªÀ» ´ëÀÔÇÏ·Á°í ÇÏ°í ÀÖ½À´Ï´Ù.";
 			}else {
-				//System.out.println("statement ëŒ€ì… opë‚˜ ëŒ€ì…ì—°ì‚°ìê°€ ì—†ìŒ");
-				this.state = "(ERROR) ë³€ìˆ˜ ë˜ëŠ” ëŒ€ì… ì—°ì‚°ìê°€ ì—†ìŠµë‹ˆë‹¤.";
+				//System.out.println("statement ´ëÀÔ op³ª ´ëÀÔ¿¬»êÀÚ°¡ ¾øÀ½");
+				this.state = "(ERROR) º¯¼ö ¶Ç´Â ´ëÀÔ ¿¬»êÀÚ°¡ ¾ø½À´Ï´Ù.";
 			}
 		}catch (IndexOutOfBoundsException e) {
-			//System.out.println("statement token_num.get ì—ëŸ¬");
-			this.state = "(ERROR) ëŒ€ì… ì—°ì‚° ìì²´ê°€ ì˜ëª»ë˜ì—ˆìŠµë‹ˆë‹¤.";
+			//System.out.println("statement token_num.get ¿¡·¯");
+			this.state = "(ERROR) ´ëÀÔ ¿¬»ê ÀÚÃ¼°¡ Àß¸øµÇ¾ú½À´Ï´Ù.";
 		}
 	}
 	public String EXPRESSION(ArrayList<Integer> token_num, ArrayList<String> code_str) {
-		if(token_num.contains(21)) {// + ì—°ì‚°ìë¡œ termê³¼ term_tail êµ¬ë¶„
+		if(token_num.contains(21)) {// + ¿¬»êÀÚ·Î term°ú term_tail ±¸ºĞ
 			int index = token_num.indexOf(21);
 			String val1 = TERM(splitInt(token_num, 0, index), splitStr(code_str, 0, index));
 			String val2 = TERM_TAIL(splitInt(token_num, index, token_num.size()), splitStr(code_str, index, code_str.size()));
 			return validVal("+", val1, val2);
-		}else if(token_num.contains(22)) {// - ì—°ì‚°ìë¡œ termê³¼ term_tail êµ¬ë¶„
+		}else if(token_num.contains(22)) {// - ¿¬»êÀÚ·Î term°ú term_tail ±¸ºĞ
 			int index = token_num.indexOf(22);
 			String val1 = TERM(splitInt(token_num, 0, index), splitStr(code_str, 0, index));
 			String val2 = TERM_TAIL(splitInt(token_num, index, token_num.size()), splitStr(code_str, index, code_str.size()));
 			return validVal("-", val1, val2);
-		}else {//term_tailì´ ì•±ì‹¤ë¡ ì¸ ê²½ìš°
+		}else {//term_tailÀÌ ¾Û½Ç·ĞÀÎ °æ¿ì
 			return TERM(token_num, code_str);
 		}
 	}
 	public String TERM(ArrayList<Integer> token_num, ArrayList<String> code_str) {
-		if(token_num.contains(31)) {// ( ê²Œ ìˆëŠ” ê²½ìš°
+		if(token_num.contains(31)) {// ( °Ô ÀÖ´Â °æ¿ì
 			int leftidx = token_num.indexOf(31);
 			int righidx = token_num.indexOf(32);
 			return EXPRESSION(splitInt(token_num, leftidx+1, righidx), splitStr(code_str, leftidx+1, righidx));
-		}else {// ê´„í˜¸ê°€ ì „í˜€ ì—†ë‹¤ë©´ *, / ë¡œ factorì™€ factor_tailì„ êµ¬ë¶„í•œë‹¤.
+		}else {// °ıÈ£°¡ ÀüÇô ¾ø´Ù¸é *, / ·Î factor¿Í factor_tailÀ» ±¸ºĞÇÑ´Ù.
 			if(token_num.contains(23)) {
 				int index = token_num.indexOf(23);
 				String val1 = FACTOR(splitInt(token_num, 0, index), splitStr(code_str, 0, index));
@@ -144,7 +144,7 @@ public class LexicalAnalyzer {
 		if(token_num.get(0)==2) {// ident
 			if(simbolTable.containsKey(code_str.get(0))) {
 				return simbolTable.get(code_str.get(0));
-			}else { // a=10 ì²˜ëŸ¼ ì•„ì´ì— í• ë‹¹ ì—°ì‚°ì´ ì—†ëŠ” ë³€ìˆ˜ê°™ì€ ê²½ìš° ì—ëŸ¬ë©”ì‹œì§€ë¥¼ ìœ„í•´ newUnknownì´ë¼ê³  ë”°ë¡œ í• ë‹¹ì„ í•´ì¤Œ(ì—ëŸ¬ë©”ì‹œì§€ ì¶œë ¥ ì´í›„ì—ëŠ” Unknownìœ¼ë¡œ)
+			}else { // a=10 Ã³·³ ¾ÆÀÌ¿¡ ÇÒ´ç ¿¬»êÀÌ ¾ø´Â º¯¼ö°°Àº °æ¿ì ¿¡·¯¸Ş½ÃÁö¸¦ À§ÇØ newUnknownÀÌ¶ó°í µû·Î ÇÒ´çÀ» ÇØÁÜ(¿¡·¯¸Ş½ÃÁö Ãâ·Â ÀÌÈÄ¿¡´Â UnknownÀ¸·Î)
 				simbolTable.put(code_str.get(0), "newUnknown");
 				return "Unknown";
 			}
@@ -153,10 +153,10 @@ public class LexicalAnalyzer {
 		}
 		/**
 		else if(token_num.get(0) == 31) {
-			//ê´„í˜¸ëŠ” termìª½ì—ì„œ í•´ê²°í•´ì„œ factor ì—ëŠ” í•„ìš” ì—†ì„ë“¯
+			//°ıÈ£´Â termÂÊ¿¡¼­ ÇØ°áÇØ¼­ factor ¿¡´Â ÇÊ¿ä ¾øÀ»µí
 		}**/
 		else {
-			this.state = "(ERROR) í”¼ì—°ì‚°ìê°€ ì—†ìŠµë‹ˆë‹¤.";
+			this.state = "(ERROR) ÇÇ¿¬»êÀÚ°¡ ¾ø½À´Ï´Ù.";
 			return "ERROR";
 		}
 	}
@@ -180,32 +180,32 @@ public class LexicalAnalyzer {
 						}
 						token_num.remove(0);
 						code_str.remove(0);
-						this.state = String.format("(WARNING) %s ì—°ì‚°ìê°€ ì¤‘ë³µë˜ì—ˆìŠµë‹ˆë‹¤. %së¥¼ ì œê±°í•©ë‹ˆë‹¤.", op, op);
+						this.state = String.format("(WARNING) %s ¿¬»êÀÚ°¡ Áßº¹µÇ¾ú½À´Ï´Ù. %s¸¦ Á¦°ÅÇÕ´Ï´Ù.", op, op);
 					}else {
 						break;
 					}
 				}
-				// + ì—°ì‚°ì§€ ë¯¸ë¦¬ ë³´ë‚´ê³  TERM, TERM_TAIL ì—°ì‚° ì§„í–‰
-				if(token_num.contains(21)) {// + ì—°ì‚°ìë¡œ termê³¼ term_tail êµ¬ë¶„
+				// + ¿¬»êÁö ¹Ì¸® º¸³»°í TERM, TERM_TAIL ¿¬»ê ÁøÇà
+				if(token_num.contains(21)) {// + ¿¬»êÀÚ·Î term°ú term_tail ±¸ºĞ
 					int index = token_num.indexOf(21);
 					String val1 = TERM(splitInt(token_num, 0, index), splitStr(code_str, 0, index));
 					String val2 = TERM_TAIL(splitInt(token_num, index, token_num.size()), splitStr(code_str, index, code_str.size()));
 					return validVal("+", val1, val2);
-				}else if(token_num.contains(22)) {// - ì—°ì‚°ìë¡œ termê³¼ term_tail êµ¬ë¶„
+				}else if(token_num.contains(22)) {// - ¿¬»êÀÚ·Î term°ú term_tail ±¸ºĞ
 					int index = token_num.indexOf(22);
 					String val1 = TERM(splitInt(token_num, 0, index), splitStr(code_str, 0, index));
 					String val2 = TERM_TAIL(splitInt(token_num, index, token_num.size()), splitStr(code_str, index, code_str.size()));
 					return validVal("-", val1, val2);
-				}else {//term_tailì´ ì•±ì‹¤ë¡ ì¸ ê²½ìš°
+				}else {//term_tailÀÌ ¾Û½Ç·ĞÀÎ °æ¿ì
 					return TERM(token_num, code_str);
 				}
 			}else {
-				//System.out.println("term_tailì— +- ì—°ì‚°ìê°€ ì—†ìŒ");
-				this.state = "(ERROR) ì—°ì‚°ìê°€ ì—†ìŠµë‹ˆë‹¤.";
+				//System.out.println("term_tail¿¡ +- ¿¬»êÀÚ°¡ ¾øÀ½");
+				this.state = "(ERROR) ¿¬»êÀÚ°¡ ¾ø½À´Ï´Ù.";
 				return "ERROR";
 			}
 		}catch(IndexOutOfBoundsException e) {
-			//System.out.println("TERM_TAIL_ ì•±ì‹¤ë¡ ");
+			//System.out.println("TERM_TAIL_ ¾Û½Ç·Ğ");
 			return "";
 		}
 	}
@@ -229,7 +229,7 @@ public class LexicalAnalyzer {
 						}
 						token_num.remove(0);
 						code_str.remove(0);
-						this.state = String.format("(WARNING) %s ì—°ì‚°ìê°€ ì¤‘ë³µë˜ì—ˆìŠµë‹ˆë‹¤. %s ë¥¼ ì œê±°í•©ë‹ˆë‹¤.", op, op);
+						this.state = String.format("(WARNING) %s ¿¬»êÀÚ°¡ Áßº¹µÇ¾ú½À´Ï´Ù. %s ¸¦ Á¦°ÅÇÕ´Ï´Ù.", op, op);
 					}else {
 						break;
 					}
@@ -248,12 +248,12 @@ public class LexicalAnalyzer {
 					return FACTOR(token_num, code_str);
 				}
 			}else {
-				//System.out.println("factor_tailì— */ ì—°ì‚°ìê°€ ì—†ìŒ");
-				this.state = "(ERROR) ì—°ì‚°ìê°€ ì—†ìŠµë‹ˆë‹¤.";
+				//System.out.println("factor_tail¿¡ */ ¿¬»êÀÚ°¡ ¾øÀ½");
+				this.state = "(ERROR) ¿¬»êÀÚ°¡ ¾ø½À´Ï´Ù.";
 				return "ERROR";
 			}
 		}catch (IndexOutOfBoundsException e) {
-			//System.out.println("Factor_TAIL_ ì•±ì‹¤ë¡ ");
+			//System.out.println("Factor_TAIL_ ¾Û½Ç·Ğ");
 			return "";
 		}
 	}
@@ -303,7 +303,7 @@ public class LexicalAnalyzer {
 					this.next_token =  32; // RIGHT_PAREN
 					this.token_string = "RIGHT_PAREN";
 				}else {
-					System.out.println("(ERROR) ìœ íš¨í•˜ì§€ ì•Šì€ í† í°ì´ ìˆìŠµë‹ˆë‹¤.");
+					System.out.println("(ERROR) À¯È¿ÇÏÁö ¾ÊÀº ÅäÅ«ÀÌ ÀÖ½À´Ï´Ù.");
 					this.next_token =  99; // ERROR
 					this.token_string = "ERROR";
 				}

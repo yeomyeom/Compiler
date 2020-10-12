@@ -12,11 +12,11 @@ public class Main {
 			String option = args[0];
 			if(option.equals("-v")) {
 				filename = args[1];
-				// v ì˜µì…˜ì´ ëˆŒë ¸ì„ë•Œ í† í°ë“¤ ì£¼ë¥´ë¥µ ì¶œë ¥
+				// v ¿É¼ÇÀÌ ´­·ÈÀ»¶§ ÅäÅ«µé ÁÖ¸£¸¤ Ãâ·Â
 				try {
 					File f = new File(filename);
 					Scanner s = new Scanner(f);
-					ArrayList<String> code = codeList(s); // ì½”ë“œ ë„ì–´ì“°ê¸° ë‹¨ìœ„ë¡œ ë‚˜ëˆ”
+					ArrayList<String> code = codeList(s); // ÄÚµå ¶ç¾î¾²±â ´ÜÀ§·Î ³ª´®
 					s.close();
 					Vmode v = new Vmode(code);
 					v.PROGRAMS();
@@ -34,22 +34,22 @@ public class Main {
 					s.close();
 					la = new LexicalAnalyzer(code);
 					la.PROGRAMS();
-					//ê·œì¹™ì— ë§ê²Œ ì •ì˜ë˜ì–´ ìˆëŠ”ì§€ í™•ì¸ í•˜ëŠ” ì ˆì°¨
+					//±ÔÄ¢¿¡ ¸Â°Ô Á¤ÀÇµÇ¾î ÀÖ´ÂÁö È®ÀÎ ÇÏ´Â ÀıÂ÷
 				}catch(FileNotFoundException e) {
 					System.out.println("file");
 				}catch(@SuppressWarnings("hiding") IOException e) {
 					System.out.println("text file encoding wrong");
 				}
-				// token_list ì— ìˆëŠ” ì• ë“¤ì´ ë¬¸ë²•ì— ì í•©í•œì§€ í™•ì¸
+				// token_list ¿¡ ÀÖ´Â ¾ÖµéÀÌ ¹®¹ı¿¡ ÀûÇÕÇÑÁö È®ÀÎ
 			}
 		}catch(java.lang.ArrayIndexOutOfBoundsException e){
-			// java -jar Main.jar ì´í›„ì— ì¸ì ì˜ëª» ì…ë ¥í•˜ë©´ ì—ëŸ¬ë©”ì‹œì§€ ì¶œë ¥
+			// java -jar Main.jar ÀÌÈÄ¿¡ ÀÎÀÚ Àß¸ø ÀÔ·ÂÇÏ¸é ¿¡·¯¸Ş½ÃÁö Ãâ·Â
 			System.out.println("args Error");
 		}
 	}
 	public static ArrayList<String> codeList(Scanner s){
-		ArrayList<String> code = new ArrayList<String>();// ì½”ë“œ í•œì¤„í•œì¤„
-		ArrayList<String> word = new ArrayList<String>();// ì½”ë“œ ë„ì–´ì“°ê¸° ê¸°ì¤€
+		ArrayList<String> code = new ArrayList<String>();// ÄÚµå ÇÑÁÙÇÑÁÙ
+		ArrayList<String> word = new ArrayList<String>();// ÄÚµå ¶ç¾î¾²±â ±âÁØ
 		while(s.hasNextLine()) {
 			code.add(s.nextLine());
 		}
