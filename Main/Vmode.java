@@ -25,7 +25,6 @@ public class Vmode {
 			token_str.add(this.token_string);
 			code_str.add(c);
 			if(this.token_string.equals("SEMI_COLON")) {
-				System.out.println(code_str);
 				token_num.remove(token_num.size() -1); // 맨뒤 세미콜론 지우기 
 				code_str.remove(code_str.size() -1);
 				token_str.remove(token_str.size() -1);
@@ -39,7 +38,6 @@ public class Vmode {
 	}
 	public void STATEMENT(ArrayList<Integer> token_num, ArrayList<String> code_str) {
 		System.out.println("STATEMENT");
-		System.out.println(code_str);
 		try {
 			if(token_num.get(0) == 2 && token_num.get(1) == 11) {
 				token_num.remove(0);
@@ -49,19 +47,18 @@ public class Vmode {
 				if(token_num.size() >= 1) {
 					EXPRESSION(token_num, code_str);
 				}else{
-					System.out.println("statement a= 뒤에 연산할꺼 없음");
+					//System.out.println("statement a= 뒤에 연산할꺼 없음");
 				}
 			}
 			else {
-				System.out.println("statement 대입 op나 대입연산자가 없음");
+				//System.out.println("statement 대입 op나 대입연산자가 없음");
 			}
 		}catch (IndexOutOfBoundsException e) {
-			System.out.println("statement token_num.get 에러");
+			//System.out.println("statement token_num.get 에러");
 		}
 	}
 	public void EXPRESSION(ArrayList<Integer> token_num, ArrayList<String> code_str) {
 		System.out.println("EXPRESSION");
-		System.out.println(code_str);
 		if(token_num.contains(21)) {// + 연산자로 term과 term_tail 구분
 			int index = token_num.indexOf(21);
 			TERM(splitInt(token_num, 0, index), splitStr(code_str, 0, index));
@@ -76,7 +73,6 @@ public class Vmode {
 	}
 	public void TERM(ArrayList<Integer> token_num, ArrayList<String> code_str) {
 		System.out.println("TERM");
-		System.out.println(code_str);
 		if(token_num.contains(31)) {// ( 게 있는 경우
 			int leftidx = token_num.indexOf(31);
 			int righidx = token_num.indexOf(32);
@@ -108,22 +104,16 @@ public class Vmode {
 	}
 	public void FACTOR(ArrayList<Integer> token_num, ArrayList<String> code_str) {
 		System.out.println("FACTOR");
-		System.out.println(code_str);
 		if(token_num.get(0) == 31) {
 			//괄호는 term쪽에서 해결했다고
 		}else if(token_num.get(0) == 2) {// ident
 			System.out.println("IDENT");
-			System.out.println("변수이름 :" + code_str.get(0));
-			//return ;
 		}else if(token_num.get(0) == 1) {// const
 			System.out.println("CONST");
-			System.out.println("상수: " + code_str.get(0));
-			//return ;
 		}
 	}
 	public void TERM_TAIL(ArrayList<Integer> token_num, ArrayList<String> code_str) {
 		System.out.println("TERM_TAIL");
-		System.out.println(code_str);
 		try {
 			if(token_num.get(0) == 21 || token_num.get(0) == 22) {
 				token_num.remove(0);
@@ -141,15 +131,14 @@ public class Vmode {
 					TERM(token_num, code_str);
 				}
 			}else {
-				System.out.println("term_tail에 +- 연산자가 없음");
+				//System.out.println("term_tail에 +- 연산자가 없음");
 			}
 		}catch(IndexOutOfBoundsException e) {
-			System.out.println("TERM_TAIL_ 앱실론");
+			
 		}	
 	}
 	public void FACTOR_TAIL(ArrayList<Integer> token_num, ArrayList<String> code_str) {
 		System.out.println("FACTOR_TAIL");
-		System.out.println(code_str);
 		try {
 			if(token_num.get(0) == 23 || token_num.get(0) == 24) {
 				token_num.remove(0);
@@ -166,10 +155,10 @@ public class Vmode {
 					FACTOR(token_num, code_str);
 				}
 			}else {
-				System.out.println("factor_tail에 */ 연산자가 없음");
+				//System.out.println("factor_tail에 */ 연산자가 없음");
 			}
 		}catch (IndexOutOfBoundsException e) {
-			System.out.println("Factor_TAIL_ 앱실론");
+			//System.out.println("Factor_TAIL_ 앱실론");
 		}
 	}
 	
