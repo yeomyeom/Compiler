@@ -42,9 +42,9 @@ public class LexicalAnalyzer {
 					idxStart = index+1;
 					functionError = false;
 				}else {
-					//function 이름이 중복되었을 때 처리
+					//같은 이름을 갖는 function이 있으면 안됨
 					System.out.println("Duplicate declaration of the function name: "+ functionName);
-					break;
+					System.exit(0);
 				}
 			}
 			else if(this.next_token == 6){
@@ -54,27 +54,21 @@ public class LexicalAnalyzer {
 					simbolTable.put(functionName, list);
 					functionError = true;
 				}else {
-					System.out.println("Syntax Error._Functions");
+					System.out.println("Syntax Error. 함수가 {} 로 묶여있지 않습니다.");
 					//함수 { } 이 구조가 아님
-					break;
+					System.exit(0);
 				}
 			}
 			before = c;
 			index++;
 		}
+		/**
+		// 확인용 코드
 		System.out.println("===============Function================");
 		simbolTable.forEach((key, value) -> {
 			System.out.println(key);
 			System.out.println(value[0]);
 			System.out.println(value[1]);
-		});
-		//main을 찾고 시작
-		/**
-		simbolTable.forEach((key, value) -> {
-			if(key.equals("main")) {
-				FUNCTION_BODY("main", getCode(this.code, value[0], value[1]));
-				return;
-			}
 		});
 		**/
 		try {
@@ -85,18 +79,27 @@ public class LexicalAnalyzer {
 			FUNCTION_BODY("main", getCode(this.code, value[0], value[1]));
 			//printStack에 있는거 출력
 		}catch(Exception e) {
-			System.out.println("Main 함수 못 찾음");
+			System.out.println("No starting function.");
 			System.out.println(e);
+			System.exit(0);
 		}
 		//프로그램에 장애가 없다면 출력
+		System.out.println("Syntax.O.K\n");
 		for(String s:printStack) {
 			System.out.println(s);
+			System.out.println(" ");
 		}
+		for(String s:ariStack) {
+			System.out.println(s);
+		}
+		
 	}
 	public void FUNCTION_BODY(String funcName, ArrayList<String> codeStr) {
 		System.out.println(funcName+" FUNCTION_BODY");
 		System.out.println(codeStr);
 		VAR_DEFINITIONS(funcName, getCode(codeStr,0,codeStr.size()-1));
+		//FUNCTION이 종료되면 ari_stack 비우기
+		cleanAriStack();
 	}
 	
 	public void VAR_DEFINITIONS(String funcName, ArrayList<String> codeStr) {
@@ -113,6 +116,8 @@ public class LexicalAnalyzer {
 			STATEMENTS(funcName, getCode(codeStr,0,codeStr.size()-1), 1);
 		}else {
 			//syntax error
+			System.out.println("Syntax Error. _VAR_DEFINITIONS");
+			System.exit(0);
 		}
 	}
 	
@@ -121,14 +126,17 @@ public class LexicalAnalyzer {
 		System.out.println(codeStr);
 		lexical(codeStr.get(0));
 		if(next_token==4) {//변수명 확인
-			if(checkIdentName(codeStr.get(0))) {//변수가 맞다면
+			if(checkIdentName(codeStr.get(0), funcName)) {//변수가 맞다면
 				ariStack.add("Local variable:"+codeStr.get(0));//stack 에 변수 이름 추가 변수 앞에는 V라는 첨자가 붙음
 				VAR_LIST(funcName, getCode(codeStr,1,codeStr.size()-1));
 			}else {
-				System.out.println("변수 명이 이미 존재합니다.");
+				//한 함수 안에서 동일한 이름의 변수 이름이 사용되었음
+				System.out.println("Duplicate declaration of the identifier: "+ codeStr.get(0));
+				System.exit(0);
 			}
 		}else {
-			System.out.println("Syntax error");
+			System.out.println("Syntax Error. _VAR_DEFINITION");
+			System.exit(0);
 		}
 	}
 	
@@ -141,12 +149,13 @@ public class LexicalAnalyzer {
 		}else if(next_token==8) {//semicolon
 			//정상종료
 		}else {
-			System.out.println("Syntax Error");
+			System.out.println("Syntax Error. _VAR_LIST");
+			System.exit(0);
 		}
 	}
 	
 	public void STATEMENTS(String funcName, ArrayList<String> codeStr, int executePoint) {
-		//executePoint는 진행한 줄수 기록
+		//executePoint는 진행한 줄 수 기록
 		System.out.println(funcName+" STATEMENTS");
 		System.out.println(codeStr);
 		if(!codeStr.isEmpty()) {
@@ -157,13 +166,10 @@ public class LexicalAnalyzer {
 				STATEMENT(funcName,getCode(codeStr,0,idx-1),executePoint);//세미콜론은 뺴고 전송한다
 				executePoint ++;//STATEMENT 실행하면 
 				STATEMENTS(funcName, getCode(codeStr, idx+1,codeStr.size()-1),executePoint);//다음 줄 구문 실행
-			}else if(next_token == 99) {//ERROR
+			}else {
 				//Syntax error
-				System.out.println("Syntax error");
-			}
-			else {
-				//Syntax error
-				System.out.println("Syntax error");
+				System.out.println("Syntax Error. _STATEMENTS");
+				System.exit(0);
 			}
 		}else {
 			//STATEMENTS 정상 종료됨
@@ -187,37 +193,58 @@ public class LexicalAnalyzer {
 					FUNCTION_BODY(codeStr.get(1), getCode(this.code, list[0], list[1]));
 				}else {
 					//function 찾을 수 없음
-					System.out.println("함수 이름이 존재하지 않습니다.");
+					System.out.println("Call to undefined function: "+ codeStr.get(1));
+					System.exit(0);
 				}
 			}else if(next_token==2) {//print_ari
 				System.out.println("printPRI!");
 				printARI(funcName);
 			}else if(next_token==4) {//ident
 				System.out.println("IDENT!");
-				if(checkIdentName(codeStr.get(0))) {
-					printIdent(codeStr.get(0));
-				}else {
-					System.out.println("변수명이 존재합니다.");
-					//나중에 함수 명이랑도 겹치는지 봐야함
+				if(checkIdentName(codeStr.get(0), funcName)) {
+					printIdent(funcName, codeStr.get(0));
 				}
 			}
 		}
 		else {
+			System.out.println("Syntax Error. _STATEMENT");
+			System.exit(0);
 			//이상한 토큰이 들어옴
 		}
 	}
 	
-	public boolean checkIdentName(String name) {
+	public boolean checkIdentName(String name, String funcName) {
 		if(name.equals("variable") || name.equals("call") || name.equals("print_ari")) {
-			System.out.println("Syntax Error_Check IdentName");
+			System.out.println("Syntax Error. 사용할 수 없는 키워드가 사용되었습니다.");
+			System.exit(0);
 			return false;
 		}
-		for(int iter=ariStack.size()-1; iter>=0; iter--) {// 지역변수중에 겹치는 것이 있는지 확인
+		if(name.equals(funcName)) {
+			System.out.println("Duplicate declaration of the identifier or the function name: "+
+								name + "/"+ funcName);
+			System.exit(0);
+			return false;
+		}
+		for(int iter=ariStack.size()-1; iter>=0; iter--) {
 			if("Dynamic Link".equals(ariStack.get(iter).split(":")[0])) {
 				break;
 			}
 			if(name.equals(ariStack.get(iter).split(":")[1])){
+				//같은 함수 내에서 이름이 같거나 
+				System.out.println("Syntax Error. 사용할 수 없는 키워드가 사용되었습니다.");
+				System.exit(0);
 				return false;
+			}
+		}
+		for(int iter=ariStack.size()-1; iter>=0; iter--) {
+			if("Return Address".equals(ariStack.get(iter).split(":")[0])){
+				if(ariStack.get(iter).split(":")[1].equals(name)) {
+					//함수 이름이랑 변수 명이 같으면 에러 
+					System.out.println("Duplicate declaration of the identifier or the function name: "+
+							name + "/"+ funcName);
+					System.exit(0);
+					return false;
+				}
 			}
 		}
 		return true;
@@ -233,27 +260,41 @@ public class LexicalAnalyzer {
 	}
 	
 	public void printARI(String nowFunctionName) {
-		System.out.println("printARI");
 		String functionName = nowFunctionName;
-		String print = functionName+": ";
-		for(int iter=ariStack.size()-1; iter>=0 ;iter--){
+		String print = functionName+": "+ariStack.get(ariStack.size()-1)+"\n";
+		for(int iter=ariStack.size()-2; iter>=0 ;iter--){
 			if(ariStack.get(iter).split(":")[0].equals("Return Address")) {
 				functionName = ariStack.get(iter).split(":")[1];
-				print = print + ariStack.get(iter);
+				print = print + functionName+": "+ariStack.get(iter);
 			}else {
 				print = print + "\t" +ariStack.get(iter);
 			}
 			print = print + "\n";
 		}
-		System.out.println(print);
 		printStack.add(print);
 	}
-	public void printIdent(String name) {
-		System.out.println("printIdent");
-		System.out.println(name);
+	public void printIdent(String funcName, String name) {
+		int linkCount = 0;
+		int localOffset = 0;
+		int currentIndex=0;
+		int returnIndex = 0;
 		for(int iter=ariStack.size()-1; iter>=0; iter--) {
-			
+			if(ariStack.get(iter).split(":")[1].equals(name)) {
+				currentIndex = iter;
+				for(int localIter=iter;localIter>=0;localIter--) {
+					if(ariStack.get(localIter).split(":")[0].equals("Return Address")) {
+						returnIndex = localIter;
+						break;
+					}
+				}
+				localOffset = currentIndex - returnIndex;
+				break;
+			}else if(ariStack.get(iter).split(":")[0].equals("Return Address")) {
+				linkCount++;
+			}
 		}
+		String print=funcName+":"+name+" => "+ linkCount + ","+localOffset;
+		printStack.add(print);
 	}
 	public HashMap<String, int[]> findFunction(String funcName){
 		for(Map.Entry<String, int[]> element: simbolTable.entrySet()) {
@@ -276,13 +317,23 @@ public class LexicalAnalyzer {
 	public String getDynamicLink() {
 		int address=0;
 		for(int iter=ariStack.size()-1;iter>=0;iter--) {
-			String kind = ariStack.get(iter).split(":")[0];
-			if(kind=="RA") {
+			if(ariStack.get(iter).split(":")[0].equals("Return Address")) {
 				address = iter;
 				break;
 			}
 		}
 		return Integer.toString(address);
+	}
+	
+	public void cleanAriStack() {//한 function에 해당하는 aristack 을 날려버림
+		for(int iter=ariStack.size()-1; iter>=0; iter--) {
+			if(ariStack.get(iter).split(":")[0].equals("Return Address")) {
+				// Return Address 제거 하고 반복문 제거
+				ariStack.remove(iter);
+				break;
+			}
+			ariStack.remove(iter);
+		}
 	}
 	
 	public void lexical(String input) {

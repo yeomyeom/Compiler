@@ -11,17 +11,14 @@ public class Main {
 		String filename;
 		LexicalAnalyzer la;
 		try {
-			//String option = args[0];
-			//filename = option;
-			filename = "eval1.txt";
+			String option = args[0];
+			filename = option;
+			//filename = "eval1.txt"; //테스트용
 			try {
 				File f = new File(filename);
 				Scanner s = new Scanner(f);
 				ArrayList<String> code = codeList(s);
 				s.close();
-				//for(int i=0; i<code.size(); i++) {
-				//	System.out.println(code.get(i));
-				//}
 				la = new LexicalAnalyzer(code);
 				la.START();
 				//규칙에 맞게 정의되어 있는지 확인 하는 절차
