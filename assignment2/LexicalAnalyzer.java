@@ -129,10 +129,6 @@ public class LexicalAnalyzer {
 			if(checkIdentName(codeStr.get(0), funcName)) {//변수가 맞다면
 				ariStack.add("Local variable:"+codeStr.get(0));//stack 에 변수 이름 추가 변수 앞에는 V라는 첨자가 붙음
 				VAR_LIST(funcName, getCode(codeStr,1,codeStr.size()-1));
-			}else {
-				//한 함수 안에서 동일한 이름의 변수 이름이 사용되었음
-				System.out.println("Duplicate declaration of the identifier: "+ codeStr.get(0));
-				System.exit(0);
 			}
 		}else {
 			System.out.println("Syntax Error. _VAR_DEFINITION");
@@ -201,9 +197,7 @@ public class LexicalAnalyzer {
 				printARI(funcName);
 			}else if(next_token==4) {//ident
 				System.out.println("IDENT!");
-				if(checkIdentName(codeStr.get(0), funcName)) {
-					printIdent(funcName, codeStr.get(0));
-				}
+				printIdent(funcName, codeStr.get(0));
 			}
 		}
 		else {
@@ -219,11 +213,14 @@ public class LexicalAnalyzer {
 			System.exit(0);
 			return false;
 		}
-		if(name.equals(funcName)) {
-			System.out.println("Duplicate declaration of the identifier or the function name: "+
-								name + "/"+ funcName);
-			System.exit(0);
-			return false;
+		
+		for(String funtionName : simbolTable.keySet()) {
+			if(name.equals(funtionName)) {
+				System.out.println("Duplicate declaration of the identifier or the function name: "+
+						name + "/"+ funcName);
+				System.exit(0);
+				return false;
+			}
 		}
 		for(int iter=ariStack.size()-1; iter>=0; iter--) {
 			if("Dynamic Link".equals(ariStack.get(iter).split(":")[0])) {
@@ -231,13 +228,14 @@ public class LexicalAnalyzer {
 			}
 			if(name.equals(ariStack.get(iter).split(":")[1])){
 				//같은 함수 내에서 이름이 같거나 
-				System.out.println("Syntax Error. 사용할 수 없는 키워드가 사용되었습니다.");
+				System.out.println("Duplicate declaration of the identifier: "+ name);
 				System.exit(0);
 				return false;
 			}
 		}
 		for(int iter=ariStack.size()-1; iter>=0; iter--) {
-			if("Return Address".equals(ariStack.get(iter).split(":")[0])){
+			if(ariStack.get(iter).split(":")[0].equals("Return Address")){
+				System.out.println(ariStack.get(iter).split(":")[1]);
 				if(ariStack.get(iter).split(":")[1].equals(name)) {
 					//함수 이름이랑 변수 명이 같으면 에러 
 					System.out.println("Duplicate declaration of the identifier or the function name: "+
@@ -278,9 +276,11 @@ public class LexicalAnalyzer {
 		int localOffset = 0;
 		int currentIndex=0;
 		int returnIndex = 0;
+		boolean isVariable = false;
 		for(int iter=ariStack.size()-1; iter>=0; iter--) {
 			if(ariStack.get(iter).split(":")[1].equals(name)) {
 				currentIndex = iter;
+				isVariable = true;
 				for(int localIter=iter;localIter>=0;localIter--) {
 					if(ariStack.get(localIter).split(":")[0].equals("Return Address")) {
 						returnIndex = localIter;
@@ -293,8 +293,14 @@ public class LexicalAnalyzer {
 				linkCount++;
 			}
 		}
-		String print=funcName+":"+name+" => "+ linkCount + ","+localOffset;
-		printStack.add(print);
+		if(isVariable) {
+			String print=funcName+":"+name+" => "+ linkCount + ","+localOffset;
+			printStack.add(print);
+		}else {
+			System.out.println("Undefined variable used: "+name+"/"+funcName);
+			System.exit(0);
+		}
+		
 	}
 	public HashMap<String, int[]> findFunction(String funcName){
 		for(Map.Entry<String, int[]> element: simbolTable.entrySet()) {
