@@ -10,7 +10,7 @@ second {
 	call third;
 	q;
 }
-third{
+third {
 	variable x, a;
 	b;
 	print_ari;
