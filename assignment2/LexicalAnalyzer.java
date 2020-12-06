@@ -1,16 +1,11 @@
 package assinmenet;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 public class LexicalAnalyzer {
 	int next_token;
-	String state;
 	String token_string;
 	ArrayList<String> code;
 	HashMap<String, int[]> simbolTable; //simbolTable (str)변수 명 : (str)변수 값 
@@ -25,9 +20,6 @@ public class LexicalAnalyzer {
 		FUNCTIONS();
 	}
 	public void FUNCTIONS() {
-		//ArrayList<Integer> token_num = new ArrayList<Integer>();
-		//ArrayList<String> token_str = new ArrayList<String>();
-		//ArrayList<String> code_str = new ArrayList<String>();
 		int index=0;
 		int idxStart=0;
 		int idxFinis=0;
@@ -77,34 +69,29 @@ public class LexicalAnalyzer {
 			ariStack = new ArrayList<String>();//
 			printStack = new ArrayList<String>();// 마지막에 syntax 에러가 없다면 출력하기 위한 용도
 			FUNCTION_BODY("main", getCode(this.code, value[0], value[1]));
-			//printStack에 있는거 출력
+			//프로그램에 장애가 없다면 출력
+			System.out.println("Syntax.O.K\n");
+			for(String s:printStack) {
+				System.out.println(s);
+				System.out.println(" ");
+			}
 		}catch(Exception e) {
 			System.out.println("No starting function.");
-			System.out.println(e);
 			System.exit(0);
 		}
-		//프로그램에 장애가 없다면 출력
-		System.out.println("Syntax.O.K\n");
-		for(String s:printStack) {
-			System.out.println(s);
-			System.out.println(" ");
-		}
-		for(String s:ariStack) {
+		/**
+		for(String s:ariStack) {//테스트 코드
 			System.out.println(s);
 		}
-		
+		**/
 	}
 	public void FUNCTION_BODY(String funcName, ArrayList<String> codeStr) {
-		System.out.println(funcName+" FUNCTION_BODY");
-		System.out.println(codeStr);
 		VAR_DEFINITIONS(funcName, getCode(codeStr,0,codeStr.size()-1));
 		//FUNCTION이 종료되면 ari_stack 비우기
 		cleanAriStack();
 	}
 	
 	public void VAR_DEFINITIONS(String funcName, ArrayList<String> codeStr) {
-		System.out.println(funcName+" VAR_DEFINITIONS");
-		System.out.println(codeStr);
 		lexical(codeStr.get(0));
 		if(next_token == 3) {
 			int idx = codeStr.indexOf(";");
@@ -122,8 +109,6 @@ public class LexicalAnalyzer {
 	}
 	
 	public void VAR_DEFINITION(String funcName, ArrayList<String> codeStr) {
-		System.out.println(funcName+" VAR_DEFINITION");
-		System.out.println(codeStr);
 		lexical(codeStr.get(0));
 		if(next_token==4) {//변수명 확인
 			if(checkIdentName(codeStr.get(0), funcName)) {//변수가 맞다면
@@ -137,8 +122,6 @@ public class LexicalAnalyzer {
 	}
 	
 	public void VAR_LIST(String funcName, ArrayList<String> codeStr) {
-		System.out.println(funcName+" VAR_LIST");
-		System.out.println(codeStr);
 		lexical(codeStr.get(0));
 		if(next_token==7) {//comma
 			VAR_DEFINITION(funcName, getCode(codeStr, 1, codeStr.size()-1));
@@ -152,8 +135,6 @@ public class LexicalAnalyzer {
 	
 	public void STATEMENTS(String funcName, ArrayList<String> codeStr, int executePoint) {
 		//executePoint는 진행한 줄 수 기록
-		System.out.println(funcName+" STATEMENTS");
-		System.out.println(codeStr);
 		if(!codeStr.isEmpty()) {
 			lexical(codeStr.get(0));
 			//variable은 VAR_DEFINITIONS에서 처리했으니 걱정 말라고
@@ -172,15 +153,12 @@ public class LexicalAnalyzer {
 		}
 	}
 	
-	public void STATEMENT(String funcName, ArrayList<String> codeStr, int ep) {
-		System.out.println(funcName+" STATEMENT");
-		System.out.println(codeStr);//세미콜론은 STATEMENT에서 뺌
+	public void STATEMENT(String funcName, ArrayList<String> codeStr, int ep) {//세미콜론은 STATEMENT에서 뺌
 		if(!codeStr.isEmpty()) {
 			lexical(codeStr.get(0));
 			if(next_token==1) {//call
 				HashMap<String, int[]> newFunc = findFunction(codeStr.get(1));
 				if(newFunc != null) {
-					System.out.println("CALL!");
 					String dynamicLink = getDynamicLink();
 					ariStack.add("Return Address:"+funcName+":"+ep);
 					ariStack.add("Dynamic Link:"+dynamicLink);
@@ -193,10 +171,8 @@ public class LexicalAnalyzer {
 					System.exit(0);
 				}
 			}else if(next_token==2) {//print_ari
-				System.out.println("printPRI!");
 				printARI(funcName);
 			}else if(next_token==4) {//ident
-				System.out.println("IDENT!");
 				printIdent(funcName, codeStr.get(0));
 			}
 		}
@@ -216,8 +192,9 @@ public class LexicalAnalyzer {
 		
 		for(String funtionName : simbolTable.keySet()) {
 			if(name.equals(funtionName)) {
+				//함수 이름이랑 변수 명이 같으면 에러 
 				System.out.println("Duplicate declaration of the identifier or the function name: "+
-						name + "/"+ funcName);
+						name);
 				System.exit(0);
 				return false;
 			}
@@ -235,11 +212,10 @@ public class LexicalAnalyzer {
 		}
 		for(int iter=ariStack.size()-1; iter>=0; iter--) {
 			if(ariStack.get(iter).split(":")[0].equals("Return Address")){
-				System.out.println(ariStack.get(iter).split(":")[1]);
 				if(ariStack.get(iter).split(":")[1].equals(name)) {
 					//함수 이름이랑 변수 명이 같으면 에러 
 					System.out.println("Duplicate declaration of the identifier or the function name: "+
-							name + "/"+ funcName);
+							name);
 					System.exit(0);
 					return false;
 				}
@@ -251,6 +227,7 @@ public class LexicalAnalyzer {
 	public boolean checkFunctionName(String funcName) {
 		for(String funtionName : simbolTable.keySet()) {
 			if(funcName.equals(funtionName)) {
+				//출력되는 메시지는 위에 구현되어 있음
 				return false;
 			}
 		}
@@ -297,7 +274,7 @@ public class LexicalAnalyzer {
 			String print=funcName+":"+name+" => "+ linkCount + ","+localOffset;
 			printStack.add(print);
 		}else {
-			System.out.println("Undefined variable used: "+name+"/"+funcName);
+			System.out.println("Undefined variable used: "+name+" in "+funcName);
 			System.exit(0);
 		}
 		

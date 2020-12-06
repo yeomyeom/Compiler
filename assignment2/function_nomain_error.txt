@@ -1,0 +1,15 @@
+first {
+	variable a, b, c;
+	call second;
+	p;
+}
+second {
+	variable x, a;
+	b;
+	print_ari;
+	q;
+}
+third {
+	variable p, q;
+	call first;
+}
